@@ -1,5 +1,6 @@
 package jp.ac.gifu_u.info.ohno.myapplication;
 
+import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -7,21 +8,17 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MyActivity extends Activity implements SensorEventListener {
 
     private SensorManager manager;
-    private TextView statusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);  // XMLレイアウトを使う
+        setContentView(R.layout.activity_main);
 
-        statusText = findViewById(R.id.status_text);  // TextViewの参照を取得
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
@@ -29,9 +26,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_LIGHT);
-        if (!sensors.isEmpty()) {
-            Sensor lightSensor = sensors.get(0);
-            manager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (sensors.size() != 0) {
+            Sensor sensor = sensors.get(0);
+            manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -42,16 +39,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-            float lux = event.values[0];
-            String str = lux + " ルクス";
-            statusText.setText(str);
-        }
-    }
+    public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // 未使用
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+            float intensity = event.values[0];
+            String str = intensity + "ルクス";
+            TextView textview = findViewById(R.id.status_text);
+            textview.setText(str);
+        }
     }
 }
